@@ -1,0 +1,12 @@
+{
+    "en": {
+      "SUCCESS": "success",
+      "FAILURE": "failure",
+      "LOGIN_SUCCESS":"You have logged in successfully",
+      "UNAUTHORIZED": "You are unauthorized",
+      "BLOCKED_USER":"You are blocked",
+      "REGISTER_SUCCESS":"You are registered successfully",
+      "USER_EXIST":"This email is already registered"
+
+    }
+  }

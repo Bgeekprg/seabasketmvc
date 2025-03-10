@@ -12,6 +12,6 @@ class UserModel(BaseModel):
     role: str
 
 
-class TokenModel(UserModel):
+class TokenModel(BaseModel):
     access_token: str
     token_type: Optional[str] = "Bearer"

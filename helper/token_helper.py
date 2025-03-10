@@ -24,14 +24,15 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 class TokenHelper:
     def create_access_token(data: dict):
         to_encode = data.copy()
-        expire = datetime.now() + timedelta(days=30)
+        expire = datetime.now() + timedelta(days=1)
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=ALGORITHM)
         return encoded_jwt
 
-    def verify_token(token: str) -> UserModel:
+    def verify_token(token: str):
         try:
             payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
+            print(f"user_id {payload}")
             user_id: int = payload.get("id")
             if user_id is None:
                 return APIHelper.send_unauthorized_error(
@@ -46,7 +47,7 @@ class TokenHelper:
             return APIHelper.send_unauthorized_error(
                 errorMessageKey="translations.UNAUTHORIZED"
             )
-        return UserModel(**user._mapping)
+        return UserModel(id=user.id,email=user.email,name=user.name,role=user.role)
 
-    def get_current_user(token: str = Depends(oauth2_scheme)) -> UserModel:
+    def get_current_user(token=Depends(oauth2_scheme)) -> UserModel:
         return TokenHelper.verify_token(token)

@@ -12,22 +12,20 @@ from utils.db_helper import DBHelper
 
 
 class AuthController:
-    def login(request: OAuth2PasswordRequestForm):
+    def login(request: OAuth2PasswordRequestForm) -> BaseResponseModel:
         user = Hash.authenticate_user(
             username=request.username, password=request.password
         )
-        access_token = TokenHelper.create_access_token(user.dict())
+        access_token = TokenHelper.create_access_token(
+            {"id": user.id, "role": user.role}
+        )
         response = TokenModel(
             access_token=access_token,
-            token_type="Bearer",
-            id=user.id,
-            email=user.email,
-            name=user.name,
-            role=user.role,
         )
-        return APIHelper.send_success_response(
-            data=response, successMessageKey="translations.LOGIN_SUCCESS"
-        )
+        # return APIHelper.send_success_response(
+        #     data=response, successMessageKey="translations.LOGIN_SUCCESS"
+        # )
+        return response
 
     def register(user_data: CreateUserModel):
         user = DBHelper.get_user_by_email(user_data.email)

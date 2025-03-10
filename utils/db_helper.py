@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 class DBHelper:
 
     def get_user_by_email(email: str):
-        with SessionLocal() as db:stat
+        with SessionLocal() as db:
             return db.query(User).filter(User.email == email).first()
 
     def get_user_by_mobile(phone_number: str):

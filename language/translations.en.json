@@ -6,7 +6,8 @@
       "UNAUTHORIZED": "You are unauthorized",
       "BLOCKED_USER":"You are blocked",
       "REGISTER_SUCCESS":"You are registered successfully",
-      "USER_EXIST":"This email is already registered"
+      "USER_EXIST":"This email is already registered",
+      "INVALID_CREDENTIAL":"Invalid credentials."
 
     }
   }

@@ -1,4 +1,5 @@
 from passlib.context import CryptContext
+from config.db_config import SessionLocal
 from helper.api_helper import APIHelper
 from dtos.auth_models import UserModel
 from utils.db_helper import DBHelper
@@ -15,6 +16,14 @@ class Hash:
 
     def authenticate_user(username: str, password: str) -> UserModel:
         user = DBHelper.get_user_by_email(username)
+
+        user_mobile = DBHelper.get_user_by_mobile(username)
+
+        if user is None and user_mobile is None:
+            return APIHelper.send_unauthorized_error(
+                errorMessageKey="translations.INVALID_CREDENTIAL"
+            )
+
         if user.status == False:
             return APIHelper.send_unauthorized_error(
                 errorMessageKey="translations.BLOCKED_USER"

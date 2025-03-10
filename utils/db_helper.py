@@ -11,6 +11,10 @@ class DBHelper:
         with SessionLocal() as db:
             return db.query(User).filter(User.email == email).first()
 
+    def get_user_by_mobile(phone_number: str):
+        with SessionLocal() as db:
+            return db.query(User).filter(User.phoneNumber == phone_number).first()
+
     def get_user_by_phone_number(phone_number: str):
         with SessionLocal() as db:
             return db.query(User).filter(User.phoneNumber == phone_number).first()

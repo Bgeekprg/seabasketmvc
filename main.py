@@ -12,6 +12,7 @@ load_dotenv(dotenv_path)
 # Importing libraries
 from fastapi import FastAPI, Request
 from routes.auth import auth
+from routes.categories import category
 from fastapi.exceptions import RequestValidationError
 
 import i18n
@@ -27,7 +28,7 @@ i18n.set("file_format", "json")
 # Initializing app
 app = FastAPI(
     title="SeaBasket",
-    version="0.1.0",
+    # version="0.1.0",
 )
 
 # Setup CORS
@@ -49,3 +50,4 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # Including the routes
 app.include_router(auth)
+app.include_router(category)

@@ -7,7 +7,15 @@
       "BLOCKED_USER":"You are blocked",
       "REGISTER_SUCCESS":"You are registered successfully",
       "USER_EXIST":"This email is already registered",
-      "INVALID_CREDENTIAL":"Invalid credentials."
+      "INVALID_CREDENTIAL":"Invalid credentials",
+      "CATEGORY_CREATED":"New Category added successfully",
+      "CATEGORY_NOT_EXIST":"Category Not exists",
+      "CATEGORY_UPDATED":"Category updated.",
+      "CATEGORY_DELETED":"Category deleted" ,
+      "PERMISSION_DENIED":"Permission denied",
+      "CATEGORY_ALREADY_EXIST":"Category already exists",
+      "CATEGORY_DELETE_FAILED":"Category delete failed"
+      
 
     }
   }

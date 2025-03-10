@@ -16,22 +16,24 @@ class Hash:
 
     def authenticate_user(username: str, password: str) -> UserModel:
         user = DBHelper.get_user_by_email(username)
+        if user is None:
+            user = DBHelper.get_user_by_mobile(username)
 
-        user_mobile = DBHelper.get_user_by_mobile(username)
-
-        if user is None and user_mobile is None:
+        if user is None:
             return APIHelper.send_unauthorized_error(
                 errorMessageKey="translations.INVALID_CREDENTIAL"
             )
 
-        if user.status == False:
+        if not user.status:
             return APIHelper.send_unauthorized_error(
                 errorMessageKey="translations.BLOCKED_USER"
             )
-        if not user and not Hash.verify(password, user.password):
+
+        if not Hash.verify(password, user.password):
             return APIHelper.send_unauthorized_error(
                 errorMessageKey="translations.INVALID_CREDENTIAL"
             )
+
         return UserModel(
             id=user.id,
             email=user.email,

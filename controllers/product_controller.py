@@ -24,6 +24,7 @@ import logging
 class ProductController:
 
     def read_product(
+        product_name: Optional[str] = None,
         price_min: Optional[float] = None,
         price_max: Optional[float] = None,
         rating: Optional[float] = None,
@@ -35,7 +36,8 @@ class ProductController:
         try:
             with SessionLocal() as db:
                 query = db.query(Product)
-
+                if product_name is not None:
+                    query = query.filter(Product.name.like(f"%{product_name}%"))
                 if price_min is not None:
                     query = query.filter(Product.price >= price_min)
                 if price_max is not None:
@@ -218,7 +220,3 @@ class ProductController:
                 except Exception as e:
                     logger.error(f"Unexpected error occurred: {e}")
                     db.rollback()
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail="Unexpected error occurred.",
-                    )

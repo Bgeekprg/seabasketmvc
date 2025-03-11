@@ -11,3 +11,10 @@ class CreateUserModel(BaseModel):
     name: str
     role: str = Field(default="customer")
     status: bool
+
+
+class UserResponseModel(BaseModel):
+    email: EmailStr
+    name: str
+    role: str
+    status: bool

@@ -3,6 +3,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import sessionmaker
 import os
+from sqlalchemy.ext.declarative import declarative_base
 
 # Initialization
 meta = MetaData()
@@ -16,3 +17,5 @@ engine = create_engine(
 )
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+
+Base = declarative_base(metadata=meta)

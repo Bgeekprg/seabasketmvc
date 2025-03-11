@@ -15,6 +15,7 @@ from fastapi import FastAPI, Request
 from routes.auth import auth
 from routes.categories import category
 from routes.products import product
+from routes.users import user
 from fastapi.exceptions import RequestValidationError
 
 import i18n
@@ -54,3 +55,4 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 app.include_router(auth)
 app.include_router(category)
 app.include_router(product)
+app.include_router(user)

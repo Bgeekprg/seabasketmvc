@@ -5,6 +5,7 @@ from helper.api_helper import APIHelper
 from helper.cors_helper import CORSHelper
 from helper.logger_helper import setup_logger
 
+
 # Setting up dotenv
 dotenv_path = join(dirname(__file__), ".env")
 load_dotenv(dotenv_path)
@@ -13,6 +14,7 @@ load_dotenv(dotenv_path)
 from fastapi import FastAPI, Request
 from routes.auth import auth
 from routes.categories import category
+from routes.products import product
 from fastapi.exceptions import RequestValidationError
 
 import i18n
@@ -51,3 +53,4 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # Including the routes
 app.include_router(auth)
 app.include_router(category)
+app.include_router(product)

@@ -54,7 +54,7 @@ class ProductResponseModel(BaseModel):
     rating: Optional[Decimal]
     isAvailable: bool
     createdAt: datetime
-    updatedAt: Optional[datetime]=None
+    updatedAt: Optional[datetime] = None
 
 
 class ProductModel(BaseModel):
@@ -93,6 +93,7 @@ class ProductListModel(BaseModel):
 
 
 class ProductFilterModel(BaseModel):
+    product_name: Optional[str] = Field(None, description="Product name for filtering.")
     price_min: Optional[float] = Field(None, description="Minimum price for filtering.")
     price_max: Optional[float] = Field(None, description="Maximum price for filtering.")
     rating: Optional[float] = Field(None, description="Rating for filtering.")

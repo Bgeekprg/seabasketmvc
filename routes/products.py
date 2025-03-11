@@ -41,6 +41,7 @@ async def delete_product(product_id: int, user: user_dependency):
 
 @product.get("/products/", response_model=List[ProductListModel])
 async def list_products(
+    product_name: Optional[str] = None,
     price_min: Optional[float] = None,
     price_max: Optional[float] = None,
     rating: Optional[float] = None,
@@ -50,6 +51,7 @@ async def list_products(
     sort_order: Optional[str] = None,
 ):
     return ProductController.read_product(
+        product_name=product_name,
         price_min=price_min,
         price_max=price_max,
         rating=rating,

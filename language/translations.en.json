@@ -39,8 +39,8 @@
       "ORDER_NOT_FOUND":"Order not found",
       "ORDER_UPDATED":"Order updated",
       "ORDER_DELETED":"Order deleted",
-      "ORDER_STATUS_UPDATED":"Order status updated"
-
+      "ORDER_STATUS_UPDATED":"Order status updated",
+      "PASSWORD_RESET_SUCCESS":"Password reset successfully"  
       
 
     }

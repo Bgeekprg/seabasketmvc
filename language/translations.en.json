@@ -40,8 +40,11 @@
       "ORDER_UPDATED":"Order updated",
       "ORDER_DELETED":"Order deleted",
       "ORDER_STATUS_UPDATED":"Order status updated",
-      "PASSWORD_RESET_SUCCESS":"Password reset successfully"  
-      
+      "PASSWORD_RESET_SUCCESS":"Password reset successfully",
+      "EMAIL_ALREADY_EXISTS":"Email already exists",
+      "PHONE_NUMBER_ALREADY_EXISTS":"Phone number already exists",
+      "USER_UPDATED":"User updated successfully",
+      "USER_DELETED":"User deleted"     
 
     }
   }

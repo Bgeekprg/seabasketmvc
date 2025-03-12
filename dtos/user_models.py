@@ -18,3 +18,10 @@ class UserResponseModel(BaseModel):
     name: str
     role: str
     status: bool
+
+
+class UserUpdateModel(BaseModel):
+    email: Optional[EmailStr]=None
+    name: Optional[str]=None
+    phoneNumber: Optional[str]=None
+    profilePic: Optional[str]=None  

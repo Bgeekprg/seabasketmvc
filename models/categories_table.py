@@ -17,4 +17,4 @@ class Category(Base):
         TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp()
     )
 
-    products = relationship("Product", backref="category_product", lazy="joined")
+    # products = relationship("Product", backref="category_product", lazy="joined")

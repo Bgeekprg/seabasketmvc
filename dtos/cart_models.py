@@ -12,3 +12,12 @@ class CartResponseModel(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CartModel(BaseModel):
+    user_id: int
+    product_id: int
+    quantity: int
+
+    class Config:
+        from_attributes = True

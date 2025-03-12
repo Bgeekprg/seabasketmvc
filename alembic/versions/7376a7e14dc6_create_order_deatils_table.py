@@ -34,8 +34,7 @@ def upgrade() -> None:
         sa.Column(
             "updatedAt",
             sa.DateTime(),
-            nullable=False,
-            server_default=sa.func.now(),
+            nullable=True,
             onupdate=sa.func.now(),
         ),
         sa.ForeignKeyConstraint(

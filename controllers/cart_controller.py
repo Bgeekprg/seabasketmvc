@@ -91,7 +91,12 @@ class CartController:
                         user_id=new_cart_item.userId,
                         product_id=new_cart_item.productId,
                         quantity=new_cart_item.quantity,
-                        price=existing_product.price,
+                        price=new_cart_item.product.price
+                        - (
+                            new_cart_item.product.discount
+                            * new_cart_item.product.price
+                            / 100
+                        ),
                         product_name=existing_product.name,
                     )
                     logger.info(f"Created new cart item: {cart_response}")

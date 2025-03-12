@@ -3,9 +3,7 @@ from sqlalchemy import Enum, String, Table, Column, func
 from sqlalchemy.sql.sqltypes import DateTime, Integer, Text, Boolean
 from config.db_config import meta
 from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
-
+from config.db_config import Base
 
 # Initializing
 class User(Base):

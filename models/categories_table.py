@@ -1,10 +1,9 @@
 from sqlalchemy import TIMESTAMP, Column
 from sqlalchemy import String, Column, func
 from sqlalchemy.sql.sqltypes import Integer, Boolean
-from config.db_config import meta
+from config.db_config import Base
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from config.db_config import Base
 
 
 class Category(Base):
@@ -18,6 +17,4 @@ class Category(Base):
         TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp()
     )
 
-    products = relationship(
-        "Product", back_populates="category", cascade="all, delete-orphan"
-    )
+    products = relationship("Product", backref="category_product", lazy="joined")

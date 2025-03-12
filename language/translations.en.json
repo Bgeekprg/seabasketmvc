@@ -24,7 +24,22 @@
       "PRODUCT_DELETED":"Product deleted" ,
       "PRODUCT_ALREADY_EXIST":"Product already exists",
       "PRODUCT_DELETE_FAILED":"Product delete failed",
-      "PRODUCT_NOT_AVAILABLE":"Product not available"
+      "PRODUCT_NOT_AVAILABLE":"Product not available",
+      "PRODUCT_NOT_FOUND":"Product not found",
+      "PRODUCT_ADDED_CART":"Product added to cart",
+      "PRODUCT_QTY_UPDATED":"Product quantity updated",
+      "PRODUCT_REMOVED_CART":"Product removed from cart",
+      "CART_ITEM_NOT_FOUND":"Cart item not found",
+      "CART_ITEM_DELETED":"Cart item deleted",
+      "CART_ITEM_DELETE_FAILED":"Cart item delete failed",
+      "CART_ITEM_UPDATED":"Cart item updated",
+      "CART_EMPTY":"Cart is empty",
+      "ORDER_CREATED":"Order created successfully",
+      "CART_CLEARED":"Cart cleared",
+      "ORDER_NOT_FOUND":"Order not found",
+      "ORDER_UPDATED":"Order updated",
+      "ORDER_DELETED":"Order deleted"
+      
 
       
 

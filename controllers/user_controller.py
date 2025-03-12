@@ -8,7 +8,7 @@ import i18n
 from config.db_config import SessionLocal
 from dtos.auth_models import UserModel
 from dtos.password_models import PasswordChangeModel
-from dtos.user_models import UserResponseModel
+from dtos.user_models import UserResponseModel, UserUpdateModel
 from helper.admin_helper import ADMINHelper
 from helper.api_helper import APIHelper
 from helper.hashing import Hash
@@ -51,6 +51,51 @@ class UserController:
             user = db.query(User).filter(User.id == user.id).first()
 
         return user
+
+    def user_update(user: UserModel, user_update: UserUpdateModel):
+        with SessionLocal() as db:
+            user = db.query(User).filter(User.id == user.id).first()
+            if user:
+                if user_update.email:
+                    email_exists = (
+                        db.query(User)
+                        .filter(User.email == user_update.email, User.id != user.id)
+                        .first()
+                    )
+                    if email_exists:
+                        return APIHelper.send_error_response(
+                            errorMessageKey="translations.EMAIL_ALREADY_EXISTS"
+                        )
+                    user.email = user_update.email
+                if user_update.name:
+                    user.name = user_update.name
+                if user_update.phoneNumber:
+                    phone_exists = (
+                        db.query(User)
+                        .filter(
+                            User.phoneNumber == user_update.phoneNumber,
+                            User.id != user.id,
+                        )
+                        .first()
+                    )
+
+                    if phone_exists:
+                        return APIHelper.send_error_response(
+                            errorMessageKey="translations.PHONE_NUMBER_ALREADY_EXISTS"
+                        )
+                    user.phoneNumber = user_update.phoneNumber
+                if user_update.profilePic:
+                    user.profilePic = user_update.profilePic
+
+                db.commit()
+
+                return APIHelper.send_success_response(
+                    successMessageKey="translations.USER_UPDATED"
+                )
+            else:
+                return APIHelper.send_error_response(
+                    errorMessageKey="translations.USER_NOT_FOUND"
+                )
 
     def change_password(user: UserModel, password: PasswordChangeModel):
         with SessionLocal() as db:

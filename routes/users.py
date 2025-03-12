@@ -4,7 +4,7 @@ from config.db_config import SessionLocal
 from controllers.user_controller import UserController
 from dtos.auth_models import UserModel
 from dtos.password_models import PasswordChangeModel
-from dtos.user_models import UserResponseModel
+from dtos.user_models import UserResponseModel, UserUpdateModel
 from typing import Annotated, List
 from fastapi.templating import Jinja2Templates
 from datetime import datetime, timezone
@@ -58,3 +58,8 @@ async def forgot_password(email: str, request: Request):
 @user.post("/reset-password")
 async def reset_password_post(token: str = Form(...), new_password: str = Form(...)):
     return await UserController.reset_password(token, new_password)
+
+
+@user.put("/user")
+async def user_update(user: user_dependency, user_update: UserUpdateModel):
+    return UserController.user_update(user, user_update)

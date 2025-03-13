@@ -135,9 +135,13 @@ class OrderController:
             )
 
     def update_order_status(user: UserModel, order_id: int, status: str):
-        if ADMINHelper.isAdmin(user):
-            pass
         db = SessionLocal()
+        if user.role != "admin" and status in ["pending", "shipped", "delivered"]:
+            raise HTTPException(
+                status_code=403,
+                detail=i18n.t("translations.PERMISSION_DENIED"),
+            )
+
         order = (
             db.query(Order)
             .filter(Order.userId == user.id, Order.id == order_id)
@@ -148,7 +152,7 @@ class OrderController:
                 status_code=404, detail=i18n.t("translations.ORDER_NOT_FOUND")
             )
 
-        order.status = status
+        order.orderStatus = status
         db.commit()
         db.close()
         return APIHelper.send_success_response(

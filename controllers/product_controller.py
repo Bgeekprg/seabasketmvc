@@ -1,5 +1,6 @@
 import locale
 from fastapi import Depends, HTTPException, status
+from sqlalchemy import desc
 from config.db_config import SessionLocal
 from dtos.auth_models import UserModel
 from dtos.base_response_model import BaseResponseModel
@@ -220,3 +221,41 @@ class ProductController:
                 except Exception as e:
                     logger.error(f"Unexpected error occurred: {e}")
                     db.rollback()
+
+    def products_carousel(limit: int):
+        logger = logging.getLogger(__name__)
+        logger.info("Getting products carousel")
+        with SessionLocal() as db:
+            try:
+                products = (
+                    db.query(Product).order_by(desc(Product.rating)).limit(limit).all()
+                )
+
+                return APIHelper.send_success_response(
+                    data=[
+                        ProductListModel(
+                            id=product.id,
+                            name=product.name,
+                            stockQuantity=product.stockQuantity,
+                            price=product.price,
+                            categoryId=product.categoryId,
+                            productUrl=product.productUrl,
+                            discount=product.discount,
+                            rating=product.rating,
+                        )
+                        for product in products
+                    ],
+                    successMessageKey=i18n.t("translations.SUCCESS"),
+                )
+            except SQLAlchemyError as e:
+                logger.error(f"Error getting products carousel: {e}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Database error occurred.",
+                )
+            except Exception as e:
+                logger.error(f"Unexpected error occurred: {e}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Unexpected error occurred.",
+                )

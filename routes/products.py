@@ -60,3 +60,8 @@ async def list_products(
         sort_by=sort_by,
         sort_order=sort_order,
     )
+
+
+@product.get("/products/carousel/{limit}")
+async def get_products_carousel(limit: int = 5):
+    return ProductController.products_carousel(limit)

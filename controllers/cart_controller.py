@@ -56,6 +56,16 @@ class CartController:
                     .first()
                 )
 
+                available_stock = existing_product.stockQuantity
+                if (
+                    existing_cart_item
+                    and existing_cart_item.quantity >= available_stock
+                ):
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=i18n.t(key="translations.NOT_ENOUGH_STOCK"),
+                    )
+
                 if existing_cart_item:
                     existing_cart_item.quantity += 1
                     db.commit()

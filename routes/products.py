@@ -49,6 +49,8 @@ async def list_products(
     category: Optional[int] = None,
     sort_by: Optional[str] = None,
     sort_order: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 10,
 ):
     return ProductController.read_product(
         product_name=product_name,
@@ -59,6 +61,8 @@ async def list_products(
         category=category,
         sort_by=sort_by,
         sort_order=sort_order,
+        page=page,
+        page_size=page_size,
     )
 
 

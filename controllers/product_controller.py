@@ -33,6 +33,8 @@ class ProductController:
         category: Optional[int] = None,
         sort_by: Optional[str] = None,
         sort_order: Optional[str] = None,
+        page: int = 1,
+        page_size: int = 10,
     ):
         try:
             with SessionLocal() as db:
@@ -55,6 +57,9 @@ class ProductController:
                         query = query.order_by(getattr(Product, sort_by).desc())
                     else:
                         query = query.order_by(getattr(Product, sort_by))
+
+                offset_value = (page - 1) * page_size
+                query = query.offset(offset_value).limit(page_size)
 
                 products = query.all()
                 return [

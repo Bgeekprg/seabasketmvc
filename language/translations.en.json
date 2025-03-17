@@ -48,7 +48,9 @@
       "ALREADY_GIVEN_REVIEW":"You have already given review for this product" ,
       "USER_REVIEW_NOT_EXIST":"Your review for this product is not exist",
       "REVIEW_OR_RATING_REQUIRED":"You must have to add review or rating",
-      "REVIEW_DELETED":"Review is deleted successfully"
+      "REVIEW_DELETED":"Review is deleted successfully",
+      "NOT_ENOUGH_STOCK":"Not enough stock available",
+      "CANNOT_CANCEL_SHIPPED_ORDER":"You can not cancel shipped or delivered order"
 
     }
   }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="06_order_details_table" author="Bhavesh">
+        <createTable tableName="order_details">
+            <column name="id" type="integer" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="orderId" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="productId" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="price" type="decimal(10,2)">
+                <constraints nullable="false" checkConstraint="price >=0"/>
+            </column>
+            <column name="discount" type="decimal(7,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="createdAt" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        
+        <addForeignKeyConstraint 
+            baseTableName="order_details" 
+            baseColumnNames="orderId" 
+            constraintName="fk_orders_order_details" 
+            referencedTableName="orders" 
+            referencedColumnNames="id" 
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint 
+            baseTableName="order_details" 
+            baseColumnNames="productId" 
+            constraintName="fk_products_order_details" 
+            referencedTableName="products" 
+            referencedColumnNames="id" 
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

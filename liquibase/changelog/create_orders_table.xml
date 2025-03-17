@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="05_orders_table" author="Bhavesh">
+        <createTable tableName="orders">
+            <column name="id" type="integer" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="userId" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="boolean"/>
+            <column name="totalAmount" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="orderStatus" type="enum('pending','shipped','delivered','cancelled')" defaultValue="pending">
+                <constraints nullable="true"/>
+            </column>
+            <column name="paymentStatus" type="enum('pending','paid','failed','refunded')" defaultValue="pending">
+                <constraints nullable="true"/>
+            </column>
+            <column name="shippingAddress" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+    
+        <addForeignKeyConstraint 
+            baseTableName="orders" 
+            baseColumnNames="userId" 
+            constraintName="fk_orders_users" 
+            referencedTableName="users" 
+            referencedColumnNames="id" 
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

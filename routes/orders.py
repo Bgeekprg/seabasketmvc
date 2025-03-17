@@ -11,8 +11,8 @@ user_dependency = Annotated[UserModel, Depends(TokenHelper.get_current_user)]
 
 
 @order.get("/orders")
-def get_all_orders(user: user_dependency):
-    return OrderController.get_orders(user)
+def get_all_orders(user: user_dependency, page: int = 1, limit: int = 10):
+    return OrderController.get_orders(user, page, limit)
 
 
 @order.get("/orders/{order_id}")

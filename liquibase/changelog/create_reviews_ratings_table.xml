@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="07_reviews_ratings_table" author="Bhavesh">
+        <createTable tableName="reviews_ratings">
+            <column name="id" type="integer" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="productId" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="userId" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating" type="decimal(3,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="reviewText" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="createdAt" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+
+        <addForeignKeyConstraint 
+            baseTableName="reviews_ratings" 
+            baseColumnNames="productId" 
+            constraintName="fk_products_ratings" 
+            referencedTableName="products" 
+            referencedColumnNames="id" 
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint 
+            baseTableName="reviews_ratings" 
+            baseColumnNames="userId" 
+            constraintName="fk_users_ratings" 
+            referencedTableName="users" 
+            referencedColumnNames="id" 
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

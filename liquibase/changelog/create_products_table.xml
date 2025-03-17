@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="03_products_table" author="Bhavesh">
+        <createTable tableName="products">
+            <column name="id" type="integer" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_products_id"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="stockQuantity" type="int" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="categoryId" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="productUrl" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="discount" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="rating" type="decimal(3,2)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="isAvailable" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="createdAt" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        
+        <addForeignKeyConstraint 
+            baseTableName="products" 
+            baseColumnNames="categoryId" 
+            constraintName="fk_products_categories" 
+            referencedTableName="categories" 
+            referencedColumnNames="id" 
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

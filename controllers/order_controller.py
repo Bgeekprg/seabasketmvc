@@ -14,12 +14,16 @@ from models.products_table import Product
 
 class OrderController:
 
-    def get_orders(user: UserModel):
+    def get_orders(user: UserModel, page: int = 1, limit: int = 10):
         db = SessionLocal()
+        offset = (page - 1) * limit
+
         orders = (
             db.query(Order)
             .filter(Order.userId == user.id)
             .order_by(desc(Order.id))
+            .offset(offset)
+            .limit(limit)
             .all()
         )
         db.close()
@@ -136,25 +140,42 @@ class OrderController:
 
     def update_order_status(user: UserModel, order_id: int, status: str):
         db = SessionLocal()
-        if user.role != "admin" and status in ["pending", "shipped", "delivered"]:
-            raise HTTPException(
-                status_code=403,
-                detail=i18n.t("translations.PERMISSION_DENIED"),
-            )
 
-        order = (
-            db.query(Order)
-            .filter(Order.userId == user.id, Order.id == order_id)
-            .first()
-        )
-        if not order:
-            raise HTTPException(
-                status_code=404, detail=i18n.t("translations.ORDER_NOT_FOUND")
+        if user.role != "admin":
+            order = (
+                db.query(Order)
+                .filter(Order.id == order_id, Order.userId == user.id)
+                .first()
             )
+            if not order:
+                raise HTTPException(
+                    status_code=404, detail=i18n.t("translations.ORDER_NOT_FOUND")
+                )
+
+            if status in ["pending", "shipped", "delivered"]:
+                raise HTTPException(
+                    status_code=403,
+                    detail=i18n.t("translations.PERMISSION_DENIED"),
+                )
+
+            if (
+                order.orderStatus == "shipped" or order.orderStatus == "delivered"
+            ) and status == "cancelled":
+                raise HTTPException(
+                    status_code=400,
+                    detail=i18n.t("translations.CANNOT_CANCEL_SHIPPED_ORDER"),
+                )
+        else:
+            order = db.query(Order).filter(Order.id == order_id).first()
+            if not order:
+                raise HTTPException(
+                    status_code=404, detail=i18n.t("translations.ORDER_NOT_FOUND")
+                )
 
         order.orderStatus = status
         db.commit()
         db.close()
+
         return APIHelper.send_success_response(
             successMessageKey="translations.ORDER_STATUS_UPDATED",
         )

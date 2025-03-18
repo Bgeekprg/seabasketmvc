@@ -98,7 +98,7 @@ class CategoryController:
                 if not category_to_delete:
                     return APIHelper.send_error_response(
                         errorMessageKey="translations.CATEGORY_NOT_EXIST",
-                    )
+                     )
 
                 try:
                     db.delete(category_to_delete)
@@ -111,5 +111,4 @@ class CategoryController:
                     db.rollback()
                     return APIHelper.send_error_response(
                         errorMessageKey="translations.CATEGORY_DELETE_FAILED",
-                        errorMessage=str(e),
                     )

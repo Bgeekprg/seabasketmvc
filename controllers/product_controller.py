@@ -1,6 +1,7 @@
 import locale
+from typing import List
 from fastapi import Depends, HTTPException, status
-from sqlalchemy import desc
+from sqlalchemy import and_, desc
 from config.db_config import SessionLocal
 from dtos.auth_models import UserModel
 from dtos.base_response_model import BaseResponseModel
@@ -38,48 +39,60 @@ class ProductController:
         sort_order: Optional[str] = None,
         page: int = 1,
         page_size: int = 10,
-    ):
+    ) -> List[ProductListModel]:
         try:
-            with SessionLocal() as db:
-                query = db.query(Product)
-                if product_name is not None:
-                    query = query.filter(Product.name.like(f"%{product_name}%"))
-                if price_min is not None:
-                    query = query.filter(Product.price >= price_min)
-                if price_max is not None:
-                    query = query.filter(Product.price <= price_max)
-                if rating is not None:
-                    query = query.filter(Product.rating >= rating)
-                if discount is not None:
-                    query = query.filter(Product.discount >= discount)
-                if category is not None:
-                    query = query.filter(Product.categoryId == category)
+            db = SessionLocal()
+            query = db.query(Product).filter(Product.isAvailable == True)
 
-                if sort_by:
+            filter_conditions = []
+            if product_name:
+                filter_conditions.append(Product.name.like(f"%{product_name}%"))
+            if price_min is not None:
+                filter_conditions.append(Product.price >= price_min)
+            if price_max is not None:
+                filter_conditions.append(Product.price <= price_max)
+            if rating is not None:
+                filter_conditions.append(Product.rating >= rating)
+            if discount is not None:
+                filter_conditions.append(Product.discount >= discount)
+            if category is not None:
+                filter_conditions.append(Product.categoryId == category)
+
+            if filter_conditions:
+                query = query.filter(and_(*filter_conditions))
+
+            if sort_by:
+                column = getattr(Product, sort_by, None)
+                if column:
                     if sort_order == "descending":
-                        query = query.order_by(getattr(Product, sort_by).desc())
+                        query = query.order_by(column.desc())
                     else:
-                        query = query.order_by(getattr(Product, sort_by))
-
-                offset_value = (page - 1) * page_size
-                query = query.offset(offset_value).limit(page_size)
-
-                products = query.all()
-                return [
-                    ProductListModel(
-                        id=product.id,
-                        name=product.name,
-                        stockQuantity=product.stockQuantity,
-                        price=product.price,
-                        categoryId=product.categoryId,
-                        productUrl=product.productUrl,
-                        discount=product.discount,
-                        rating=product.rating,
+                        query = query.order_by(column)
+                else:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Invalid sort field: {sort_by}",
                     )
-                    for product in products
-                ]
-        except SQLAlchemyError as e:
-            logging.error(e)
+
+            offset_value = (page - 1) * page_size
+            query = query.offset(offset_value).limit(page_size)
+
+            products = query.all()
+            return [
+                ProductListModel(
+                    id=product.id,
+                    name=product.name,
+                    stockQuantity=product.stockQuantity,
+                    price=product.price,
+                    categoryId=product.categoryId,
+                    productUrl=product.productUrl,
+                    discount=product.discount,
+                    rating=product.rating,
+                )
+                for product in products
+            ]
+        except Exception as e:
+            logging.error(f"Error occurred while fetching products: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Database error occurred.",

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import List, Optional
 from decimal import Decimal
 from datetime import datetime
 
@@ -55,6 +55,8 @@ class ProductResponseModel(BaseModel):
     isAvailable: bool
     createdAt: datetime
     updatedAt: Optional[datetime] = None
+    images: Optional[List[str]] = None
+
 
 
 class ProductModel(BaseModel):

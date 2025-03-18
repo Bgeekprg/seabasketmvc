@@ -14,6 +14,8 @@ from dtos.products_models import (
 from helper.admin_helper import ADMINHelper
 from helper.api_helper import APIHelper
 from helper.token_helper import TokenHelper
+from models.order_details_table import OrderDetail
+from models.orders_table import Order
 from models.product_images_table import ProductImage
 from models.products_table import Product
 from models.categories_table import Category
@@ -206,15 +208,36 @@ class ProductController:
     def delete_product(product_id: int, user: UserModel):
         logger = logging.getLogger(__name__)
         logger.info(f"Deleting product with ID: {product_id}")
+
         if ADMINHelper.isAdmin(user):
             with SessionLocal() as db:
                 try:
                     exist_product = (
                         db.query(Product).filter(Product.id == product_id).first()
                     )
+
                     if exist_product:
+                        order_details_to_delete = (
+                            db.query(OrderDetail)
+                            .filter(OrderDetail.productId == product_id)
+                            .all()
+                        )
+
+                        for order_detail in order_details_to_delete:
+                            db.delete(order_detail)
+
+                        order_ids = [
+                            order_detail.orderId
+                            for order_detail in order_details_to_delete
+                        ]
+                        db.query(Order).filter(Order.id.in_(order_ids)).delete(
+                            synchronize_session=False
+                        )
+
                         db.delete(exist_product)
+
                         db.commit()
+
                         return APIHelper.send_success_response(
                             successMessageKey=i18n.t("translations.PRODUCT_DELETED"),
                         )
@@ -224,6 +247,7 @@ class ProductController:
                             status_code=status.HTTP_404_NOT_FOUND,
                             detail=i18n.t("translations.PRODUCT_NOT_EXIST"),
                         )
+
                 except SQLAlchemyError as e:
                     logger.error(f"Error deleting product: {e}")
                     db.rollback()
@@ -234,6 +258,10 @@ class ProductController:
                 except Exception as e:
                     logger.error(f"Unexpected error occurred: {e}")
                     db.rollback()
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail="Unexpected error occurred.",
+                    )
 
     def products_carousel(limit: int):
         logger = logging.getLogger(__name__)

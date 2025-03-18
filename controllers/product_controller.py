@@ -14,6 +14,7 @@ from dtos.products_models import (
 from helper.admin_helper import ADMINHelper
 from helper.api_helper import APIHelper
 from helper.token_helper import TokenHelper
+from models.product_images_table import ProductImage
 from models.products_table import Product
 from models.categories_table import Category
 from dtos.categories_models import *
@@ -134,6 +135,12 @@ class ProductController:
         with SessionLocal() as db:
             product = db.query(Product).filter(Product.id == product_id).first()
             if product:
+                product_images = (
+                    db.query(ProductImage)
+                    .filter(ProductImage.productId == product_id)
+                    .all()
+                )
+                images = [image.imageUrl for image in product_images]
                 product_response = ProductResponseModel(
                     id=product.id,
                     name=product.name,
@@ -147,6 +154,7 @@ class ProductController:
                     isAvailable=product.isAvailable,
                     createdAt=product.createdAt,
                     updatedAt=product.updatedAt,
+                    images=images,
                 )
                 return product_response
             else:

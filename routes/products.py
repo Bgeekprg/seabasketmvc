@@ -4,7 +4,6 @@ from controllers.product_image_controller import ProductImageController
 from dtos.auth_models import UserModel
 from dtos.products_models import (
     CreateProductModel,
-    ProductImageCreateModel,
     ProductListModel,
     ProductModel,
     UpdateProductModel,
@@ -78,3 +77,13 @@ async def upload_product_image(
     user: user_dependency, product_id: int, files: List[UploadFile]
 ):
     return await ProductImageController.upload_product_images(user, product_id, files)
+
+
+@product.get("/product/product_images")
+async def get_product_images(product_id: int):
+    return ProductImageController.get_product_images(product_id)
+
+
+@product.delete("/products/product_images/{product_id}/{image_id}")
+async def delete_product_image(product_id: int, image_id: int, user: user_dependency):
+    return ProductImageController.delete_product_image(product_id, image_id, user)

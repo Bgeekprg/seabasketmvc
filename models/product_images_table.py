@@ -8,6 +8,4 @@ class ProductImage(Base):
     productId = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"))
     imageUrl = Column(String(255), nullable=False)
     createdAt = Column(TIMESTAMP, default=func.current_timestamp())
-    updatedAt = Column(
-        TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp()
-    )
+    updatedAt = Column(TIMESTAMP, onupdate=func.current_timestamp())

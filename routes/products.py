@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from controllers.product_controller import ProductController
+from controllers.product_image_controller import ProductImageController
 from dtos.auth_models import UserModel
 from dtos.products_models import (
     CreateProductModel,
@@ -69,3 +70,20 @@ async def list_products(
 @product.get("/products/carousel/{limit}")
 async def get_products_carousel(limit: int = 5):
     return ProductController.products_carousel(limit)
+
+
+@product.post("/products/upload_images")
+async def upload_product_image(
+    user: user_dependency, product_id: int, files: List[UploadFile]
+):
+    return await ProductImageController.upload_product_images(user, product_id, files)
+
+
+@product.get("/product/product_images")
+async def get_product_images(product_id: int):
+    return ProductImageController.get_product_images(product_id)
+
+
+@product.delete("/products/product_images/{product_id}/{image_id}")
+async def delete_product_image(product_id: int, image_id: int, user: user_dependency):
+    return ProductImageController.delete_product_image(product_id, image_id, user)

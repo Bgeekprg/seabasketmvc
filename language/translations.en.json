@@ -50,7 +50,10 @@
       "REVIEW_OR_RATING_REQUIRED":"You must have to add review or rating",
       "REVIEW_DELETED":"Review is deleted successfully",
       "NOT_ENOUGH_STOCK":"Not enough stock available",
-      "CANNOT_CANCEL_SHIPPED_ORDER":"You can not cancel shipped or delivered order"
+      "CANNOT_CANCEL_SHIPPED_ORDER":"You can not cancel shipped or delivered order",
+      "PRODUCT_IMAGES_DELETE_SUCCESS":"Product image deleted successfully",
+      "PRODUCT_IMAGE_NOT_FOUND":"Product image not found",
+      "PRODUCT_IMAGES_UPLOAD_SUCCESS":"Product image uploaded successfully"
 
     }
   }

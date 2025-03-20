@@ -19,6 +19,7 @@ from routes.users import user
 from routes.carts import cart
 from routes.orders import order
 from routes.review_ratings import review_rating
+from routes.payments import payment
 from fastapi.exceptions import RequestValidationError
 
 import i18n
@@ -62,3 +63,4 @@ app.include_router(cart)
 app.include_router(user)
 app.include_router(order)
 app.include_router(review_rating)
+app.include_router(payment)

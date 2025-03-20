@@ -16,5 +16,6 @@
     <include file="changelog/create_reviews_ratings_table.xml"/>
     <include file="changelog/create_reset_tokens_table.xml"/>
     <include file="changelog/create_product_images_table.xml"/>
+    <include file="changelog/create_payments_table.xml"/>
     
 </databaseChangeLog>

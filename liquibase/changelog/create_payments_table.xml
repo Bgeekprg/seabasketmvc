@@ -11,6 +11,11 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
 
+            <column name="userId" type="integer">
+                <constraints nullable="false" />
+            </column>
+
+
             <column name="orderId" type="integer">
                 <constraints nullable="false" />
             </column>
@@ -26,6 +31,14 @@
             <column name="status" type="enum('paid','unpaid','refunded','failed')" defaultValue="unpaid">
                 <constraints nullable="false"/>
             </column>
+
+            <column name="createdAt" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updatedAt" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
 
         <addForeignKeyConstraint 
@@ -33,6 +46,15 @@
             baseColumnNames="orderId" 
             constraintName="fk_order_payments" 
             referencedTableName="orders" 
+            referencedColumnNames="id" 
+            onDelete="CASCADE"/>
+
+
+        <addForeignKeyConstraint 
+            baseTableName="payments" 
+            baseColumnNames="userId" 
+            constraintName="fk_users_payments" 
+            referencedTableName="users" 
             referencedColumnNames="id" 
             onDelete="CASCADE"/>
     </changeSet>

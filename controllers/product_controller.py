@@ -103,6 +103,14 @@ class ProductController:
         logger.info(f"Creating product with data: {product}")
         if ADMINHelper.isAdmin(user):
             with SessionLocal() as db:
+                category = (
+                    db.query(Category).filter(Category.id == product.categoryId).first()
+                )
+                if not category:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail="Category not exist",
+                    )
                 new_product = Product(**product.model_dump())
                 try:
                     logger.info("Adding new product to the database.")

@@ -1,6 +1,8 @@
 # Loading the .env file
 from dotenv import load_dotenv
 from os.path import join, dirname
+
+from fastapi.staticfiles import StaticFiles
 from helper.api_helper import APIHelper
 from helper.cors_helper import CORSHelper
 from helper.logger_helper import setup_logger
@@ -26,6 +28,7 @@ import i18n
 # Setup Logger
 setup_logger()
 
+
 # Setup i18n
 i18n.load_path.append("language/")
 i18n.set("filename_format", "{namespace}.{locale}.{format}")
@@ -36,7 +39,7 @@ app = FastAPI(
     title="SeaBasket",
     # version="0.1.0",
 )
-
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 # Setup CORS
 CORSHelper.setup_cors(app)
 

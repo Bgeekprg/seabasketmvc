@@ -15,6 +15,9 @@ from helper.hashing import Hash
 from models.reset_tokens_table import ResetToken
 from models.users_table import User
 from sqlalchemy.exc import SQLAlchemyError
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class UserController:

@@ -56,9 +56,7 @@ class ProductResponseModel(BaseModel):
     createdAt: datetime
     updatedAt: Optional[datetime] = None
     images: Optional[List[str]] = None
-
-
-
+    
 class ProductModel(BaseModel):
     id: int
     name: str = Field(..., min_length=1, description="The name of the product.")

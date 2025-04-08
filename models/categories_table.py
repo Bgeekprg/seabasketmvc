@@ -4,6 +4,7 @@ from sqlalchemy.sql.sqltypes import Integer, Boolean
 from config.db_config import Base
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy import Enum
 
 
 class Category(Base):
@@ -11,7 +12,7 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     categoryName = Column(String(100), nullable=False)
-    status = Column(Boolean, default=True)
+    status = Column(Enum("active", "inactive"), default="active")
     createdAt = Column(TIMESTAMP, default=func.current_timestamp())
     updatedAt = Column(
         TIMESTAMP, default=func.current_timestamp(), onupdate=func.current_timestamp()

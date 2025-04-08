@@ -106,11 +106,27 @@ class ProductController:
                 category = (
                     db.query(Category).filter(Category.id == product.categoryId).first()
                 )
+                category_inactive = (
+                    db.query(Category)
+                    .filter(
+                        and_(
+                            Category.id == product.categoryId,
+                            Category.status == "inactive",
+                        )
+                    )
+                    .first()
+                )
+                if category_inactive:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Category is inactive",
+                    )
                 if not category:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="Category not exist",
                     )
+
                 new_product = Product(**product.model_dump())
                 try:
                     logger.info("Adding new product to the database.")
@@ -190,41 +206,69 @@ class ProductController:
 
     def update_product(product_id: int, product: UpdateProductModel, user: UserModel):
         logger = logging.getLogger(__name__)
-        logger.info(f"Updating product with ID: {product_id}")
-        if ADMINHelper.isAdmin(user):
-            with SessionLocal() as db:
-                try:
-                    exist_product = (
-                        db.query(Product).filter(Product.id == product_id).first()
-                    )
-                    if exist_product:
-                        for key, value in product.dict().items():
-                            if value is not None:
-                                setattr(exist_product, key, value)
+        logger.info(f"Attempting to update product with ID: {product_id}")
 
-                        db.commit()
-                        db.refresh(exist_product)
-                        return exist_product
-                    else:
-                        logger.error(f"Product with ID {product_id} not found.")
+        if ADMINHelper.isAdmin(user):
+            pass
+
+        with SessionLocal() as db:
+            try:
+                # Fetch the existing product
+                exist_product = (
+                    db.query(Product).filter(Product.id == product_id).first()
+                )
+                if not exist_product:
+                    logger.error(f"Product with ID {product_id} not found.")
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail="Product not found.",
+                    )
+
+                # Check if the category is active only if categoryId is provided
+                if product.categoryId:
+                    category = (
+                        db.query(Category)
+                        .filter(Category.id == product.categoryId)
+                        .first()
+                    )
+                    if not category or category.status != "active":
+                        logger.error(
+                            f"Category ID {product.categoryId} is inactive or does not exist."
+                        )
                         raise HTTPException(
                             status_code=status.HTTP_404_NOT_FOUND,
-                            detail=i18n.t("translations.PRODUCT_NOT_EXIST"),
+                            detail="Category is inactive or does not exist.",
                         )
-                except SQLAlchemyError as e:
-                    logger.error(f"Error updating product: {e}")
-                    db.rollback()
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail="Database error occurred.",
-                    )
-                except Exception as e:
-                    logger.error(f"Unexpected error occurred: {e}")
-                    db.rollback()
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail="Unexpected error occurred.",
-                    )
+
+                # Update product attributes
+                updated_data = product.dict(exclude_unset=True)
+                for key, value in updated_data.items():
+                    setattr(exist_product, key, value)
+
+                db.commit()
+                db.refresh(exist_product)
+                logger.info(f"Product with ID {product_id} successfully updated.")
+                return exist_product
+
+            except SQLAlchemyError as db_err:
+                logger.error(
+                    f"Database error while updating product {product_id}: {db_err}"
+                )
+                db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="A database error occurred.",
+                )
+
+            except Exception as e:
+                logger.error(
+                    f"Unexpected error occurred while updating product {product_id}: {e}"
+                )
+                db.rollback()
+                raise HTTPException(
+                    status_code=e.status_code,
+                    detail=e.detail,
+                )
 
     def delete_product(product_id: int, user: UserModel):
         logger = logging.getLogger(__name__)

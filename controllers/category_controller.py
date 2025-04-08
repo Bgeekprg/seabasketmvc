@@ -12,10 +12,8 @@ import i18n
 
 
 class CategoryController:
-    def get_categories(id, status):
+    def get_categories(status):
         with SessionLocal() as db:
-            if id:
-                return db.query(Category).filter(Category.id == id).first()
             if status != None:
                 return db.query(Category).filter(Category.status == status).all()
 
@@ -44,6 +42,31 @@ class CategoryController:
                     )
                 except:
                     db.rollback()
+
+    def get_category_by_id(category_id: int) -> BaseResponseModel:
+        with SessionLocal() as db:
+            category = db.query(Category).filter(Category.id == category_id).first()
+            if category:
+                return APIHelper.send_success_response(
+                    data=CategoryModel(
+                        id=category.id,
+                        categoryName=category.categoryName,
+                        status=category.status,
+                        created_at=category.createdAt,
+                        updated_at=category.updatedAt,
+                    )
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=i18n.t(
+                        key="translations.CATEGORY_NOT_EXIST",
+                        locale=locale,
+                    ),
+                )
+            return APIHelper.send_error_response(
+                errorMessageKey="translations.CATEGORY_NOT_EXIST",
+            )
 
     def update_category(
         category_id: int, category: CategoryUpdate, user: UserModel
@@ -98,7 +121,7 @@ class CategoryController:
                 if not category_to_delete:
                     return APIHelper.send_error_response(
                         errorMessageKey="translations.CATEGORY_NOT_EXIST",
-                     )
+                    )
 
                 try:
                     db.delete(category_to_delete)

@@ -16,7 +16,11 @@ class CartController:
         try:
             cart_items = db.query(Cart).filter(Cart.userId == user.id).all()
             db.close()
-            return [
+            total_amount = sum(
+                item.product.price - (item.product.discount * item.product.price / 100)
+                for item in cart_items
+            )
+            cart_response = [
                 CartResponseModel(
                     id=item.id,
                     user_id=item.userId,
@@ -28,6 +32,11 @@ class CartController:
                 )
                 for item in cart_items
             ]
+
+            return APIHelper.send_success_response(
+                data={"cart_items": cart_response, "total_amount": total_amount},
+                successMessageKey="translations.SUCCESS",
+            )
 
         except Exception as e:
             logging.error(f"Error in get_cart: {e}")

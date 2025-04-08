@@ -5,8 +5,9 @@ from controllers.category_controller import CategoryController
 from controllers.auth_controller import AuthController
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from dtos.auth_models import UserModel
-from dtos.categories_models import CategoryCreate, CategoryUpdate
+from dtos.categories_models import CategoryCreate, CategoryStatus, CategoryUpdate
 from helper.token_helper import TokenHelper
+from sqlalchemy import Enum
 
 # Declaring router
 category = APIRouter(tags=["Categories"])
@@ -15,8 +16,13 @@ user_dependency = Annotated[UserModel, Depends(TokenHelper.get_current_user)]
 
 
 @category.get("/categories")
-async def get_categories(id: int = None, status: bool = None):
-    return CategoryController.get_categories(id, status)
+async def get_categories(status: CategoryStatus = None):
+    return CategoryController.get_categories(status)
+
+
+@category.get("/categories/{category_id}")
+async def get_category_by_id(category_id: int):
+    return CategoryController.get_category_by_id(category_id)
 
 
 @category.post("/categories")

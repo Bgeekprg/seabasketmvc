@@ -19,7 +19,6 @@ greenlet==3.1.1
 h11==0.14.0
 httpcore==1.0.7
 httpx==0.28.1
-i18n==0.2
 idna==3.10
 iniconfig==2.0.0
 Jinja2==3.1.5

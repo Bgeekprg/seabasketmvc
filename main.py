@@ -1,12 +1,13 @@
 # Loading the .env file
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from os.path import join, dirname
-
+from config.db_config import *
 from fastapi.staticfiles import StaticFiles
 from helper.api_helper import APIHelper
 from helper.cors_helper import CORSHelper
 from helper.logger_helper import setup_logger
-
+from sqlalchemy.exc import OperationalError
 
 # Setting up dotenv
 dotenv_path = join(dirname(__file__), ".env")
@@ -34,9 +35,26 @@ i18n.load_path.append("language/")
 i18n.set("filename_format", "{namespace}.{locale}.{format}")
 i18n.set("file_format", "json")
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        with engine.connect() as conn:
+            pass
+        print("✅ DB connected")
+    except OperationalError as e:
+        print("❌ DB connection failed:", e)
+
+    yield
+
+    engine.dispose()
+    print("🔌 DB disconnected")
+
+
 # Initializing app
 app = FastAPI(
     title="SeaBasket",
+    lifespan=lifespan,
     # version="0.1.0",
 )
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

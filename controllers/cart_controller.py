@@ -17,7 +17,11 @@ class CartController:
             cart_items = db.query(Cart).filter(Cart.userId == user.id).all()
             db.close()
             total_amount = sum(
-                item.product.price - (item.product.discount * item.product.price / 100)
+                (
+                    item.product.price
+                    - (item.product.discount * item.product.price / 100)
+                )
+                * item.quantity
                 for item in cart_items
             )
             cart_response = [

@@ -16,7 +16,7 @@ class CreateProductModel(BaseModel):
         ..., gt=0, description="The price of the product, must be greater than 0."
     )
     categoryId: Optional[int] = None
-    productUrl: Optional[str] = None
+    # productUrl: Optional[str] = None
     discount: Optional[int] = None
     rating: Optional[Decimal] = None
     isAvailable: bool = True
@@ -56,7 +56,8 @@ class ProductResponseModel(BaseModel):
     createdAt: datetime
     updatedAt: Optional[datetime] = None
     images: Optional[List[str]] = None
-    
+
+
 class ProductModel(BaseModel):
     id: int
     name: str = Field(..., min_length=1, description="The name of the product.")

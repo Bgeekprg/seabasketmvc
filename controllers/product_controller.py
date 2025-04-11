@@ -1,6 +1,8 @@
 import locale
+import os
 from typing import List
-from fastapi import Depends, HTTPException, status
+import uuid
+from fastapi import Depends, File, HTTPException, UploadFile, status
 from sqlalchemy import and_, desc
 from config.db_config import SessionLocal
 from dtos.auth_models import UserModel
@@ -98,75 +100,137 @@ class ProductController:
                 detail="Database error occurred.",
             )
 
-    def create_product(product: CreateProductModel, user: UserModel):
+    async def create_product(
+        product: CreateProductModel,  
+        user: UserModel,  
+        file: UploadFile = File(None),
+    ):
         logger = logging.getLogger(__name__)
-        logger.info(f"Creating product with data: {product}")
-        if ADMINHelper.isAdmin(user):
-            with SessionLocal() as db:
-                category = (
-                    db.query(Category).filter(Category.id == product.categoryId).first()
-                )
-                category_inactive = (
-                    db.query(Category)
-                    .filter(
-                        and_(
-                            Category.id == product.categoryId,
-                            Category.status == "inactive",
-                        )
-                    )
-                    .first()
-                )
-                if category_inactive:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="Category is inactive",
-                    )
-                if not category:
-                    raise HTTPException(
-                        status_code=status.HTTP_404_NOT_FOUND,
-                        detail="Category not exist",
-                    )
+        logger.info(f"User {user.id} creating product with data: {product}")
 
-                new_product = Product(**product.model_dump())
+        if not ADMINHelper.isAdmin(user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only admins can create products",
+            )
+
+        with SessionLocal() as db:
+            
+            category = (
+                db.query(Category).filter(Category.id == product.categoryId).first()
+            )
+            if not category:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Category does not exist",
+                )
+            if category.status == False:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Category is inactive",
+                )
+
+            # Prepare product data
+            product_dict = product.model_dump()
+            product_url = None
+
+            # Handle file upload
+            if file:
                 try:
-                    logger.info("Adding new product to the database.")
-                    db.add(new_product)
-                    logger.info("Committing the new product to the database.")
-                    db.commit()
-                    db.refresh(new_product)
-                    product_response = ProductResponseModel(
-                        id=new_product.id,
-                        name=new_product.name,
-                        description=new_product.description,
-                        stockQuantity=new_product.stockQuantity,
-                        price=new_product.price,
-                        categoryId=new_product.categoryId,
-                        productUrl=new_product.productUrl,
-                        discount=new_product.discount,
-                        rating=new_product.rating,
-                        isAvailable=new_product.isAvailable,
-                        createdAt=new_product.createdAt,
-                        updatedAt=new_product.updatedAt,
-                    )
-                    return APIHelper.send_success_response(
-                        successMessageKey=i18n.t("translations.PRODUCT_CREATED"),
-                        data=product_response,
+                    # Validate file extension
+                    allowed_extensions = {".jpg", ".jpeg", ".png"}
+                    file_extension = f".{file.filename.split('.')[-1].lower()}"
+                    if file_extension not in allowed_extensions:
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Only JPG and PNG files are allowed",
+                        )
+
+                    # Validate file size (max 5MB)
+                    content = await file.read()
+                    if len(content) > 5 * 1024 * 1024:
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="File size exceeds 5MB limit",
+                        )
+
+                    # Define upload directory and ensure it exists
+                    upload_dir = os.getenv("UPLOAD_DIR", "uploads")
+                    os.makedirs(upload_dir, exist_ok=True)
+
+                    # Generate unique filename
+                    unique_filename = f"{uuid.uuid4()}{file_extension}"
+                    file_path = os.path.join(upload_dir, unique_filename)
+
+                    # Save file to disk
+                    with open(file_path, "wb") as f:
+                        f.write(content)
+
+                    # Set productUrl
+                    product_url = f"/{upload_dir}/{unique_filename}"
+                    logger.info(f"Image uploaded successfully: {product_url}")
+
+                except Exception as e:
+                    logger.error(f"Error uploading file: {str(e)}")
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail=f"Failed to upload image: {str(e)}",
                     )
 
-                except SQLAlchemyError as e:
-                    db.rollback()
-                    logger.error(f"Database error occurred: {str(e)}")
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail=f"Database error occurred: {str(e)}",
-                    )
-                except Exception as e:
-                    db.rollback()
-                    logger.error(f"Unexpected error occurred: {str(e)}")
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail=f"Unexpected error occurred: {str(e)}",
-                    )
+            # Add productUrl to product data
+            product_dict["productUrl"] = product_url
+
+            # Create new product
+            new_product = Product(**product_dict)
+            try:
+                logger.info("Adding new product to the database.")
+                db.add(new_product)
+                logger.info("Committing the new product to the database.")
+                db.commit()
+                db.refresh(new_product)
+
+                # Prepare response
+                product_response = ProductResponseModel(
+                    id=new_product.id,
+                    name=new_product.name,
+                    description=new_product.description,
+                    stockQuantity=new_product.stockQuantity,
+                    price=new_product.price,
+                    categoryId=new_product.categoryId,
+                    productUrl=new_product.productUrl,
+                    discount=new_product.discount,
+                    rating=new_product.rating,
+                    isAvailable=new_product.isAvailable,
+                    createdAt=(
+                        new_product.createdAt.isoformat()
+                        if new_product.createdAt
+                        else None
+                    ),
+                    updatedAt=(
+                        new_product.updatedAt.isoformat()
+                        if new_product.updatedAt
+                        else None
+                    ),
+                )
+                return APIHelper.send_success_response(
+                    successMessageKey=i18n.t("translations.PRODUCT_CREATED"),
+                    data=product_response,
+                )
+
+            except SQLAlchemyError as e:
+                db.rollback()
+                logger.error(f"Database error occurred: {str(e)}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Database error occurred: {str(e)}",
+                )
+            except Exception as e:
+                db.rollback()
+                logger.error(f"Unexpected error occurred: {str(e)}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Unexpected error occurred: {str(e)}",
+                )
 
     def read_product_by_id(product_id: int):
         logger = logging.getLogger(__name__)

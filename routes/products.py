@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from controllers.product_controller import ProductController
 from controllers.product_image_controller import ProductImageController
 from dtos.auth_models import UserModel
@@ -18,9 +18,32 @@ product = APIRouter(tags=["Products"])
 user_dependency = Annotated[UserModel, Depends(TokenHelper.get_current_user)]
 
 
-@product.post("/products/", status_code=201)
-async def create_product(product: CreateProductModel, user: user_dependency):
-    return ProductController.create_product(product, user)
+# Example route
+@product.post("/products")
+async def create_product_endpoint(
+    user: user_dependency,
+    name: str = Form(...),
+    price: float = Form(...),
+    stockQuantity: int = Form(default=0),
+    description: Optional[str] = Form(default=None),
+    categoryId: Optional[int] = Form(default=None),
+    discount: Optional[int] = Form(default=None),
+    rating: Optional[float] = Form(default=None),
+    isAvailable: bool = Form(default=True),
+    file: UploadFile = File(None),
+):
+    # Construct CreateProductModel from form fields
+    product = CreateProductModel(
+        name=name,
+        price=price,
+        stockQuantity=stockQuantity,
+        description=description,
+        categoryId=categoryId,
+        discount=discount,
+        rating=rating,
+        isAvailable=isAvailable,
+    )
+    return await ProductController.create_product(product, user, file)
 
 
 @product.get("/products/{product_id}", response_model=ProductResponseModel)
